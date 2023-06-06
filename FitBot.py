@@ -1,17 +1,21 @@
+# Import necessary libraries
 import os
 import openai
 import gradio
 from youtube_search import YoutubeSearch
 from gradio import components
 
+# Set OpenAI API key
 openai.api_key = "Type Your Api Key Here"
 
-
+# Define start and restart sequences for conversation history
 start_sequence = "\nTrainer:"
 restart_sequence = "\nClient: "
 
+# Define initial prompt for the conversation
 prompt = "The following is a conversation with a gym trainer. The trainer is knowledgeable, helpful, and dedicated to helping you reach your fitness goals.\n\nClient: Hi, I need some guidance on my workout routine.\nTrainer: "
 
+# Function to generate response using OpenAI API
 def openai_create(prompt):
     response = openai.Completion.create(
         model="text-davinci-003",
@@ -25,7 +29,7 @@ def openai_create(prompt):
     )
     return response.choices[0].text
 
-
+# Function to handle conversation history
 def chatgpt_clone(input, history, client_info):
     history = history or []
     s = list(sum(history, ()))
@@ -36,7 +40,7 @@ def chatgpt_clone(input, history, client_info):
     history.append((input, output))
     return history, history
 
-
+# Function to perform YouTube search and retrieve video links
 def search_videos(query, max_results=5):
     try:
         # Perform a YouTube search
@@ -50,12 +54,12 @@ def search_videos(query, max_results=5):
         print("An error occurred:", str(e))
         return []
 
-
+# Function to get video links based on a query
 def get_video_links(query):
     video_links = search_videos(query)
     return "\n".join(video_links)
 
-
+# Function to handle the chat interface
 def chat_interface(message, client_info, video_query):
     if message.strip() == "" and video_query.strip() == "":
         # Return empty outputs if both queries are empty
@@ -65,15 +69,17 @@ def chat_interface(message, client_info, video_query):
     video_links = ""
 
     if message.strip() != "":
+        # Generate chatbot response using OpenAI
         response = openai_create(message)
         chatbot_output = response.split("Trainer:")[-1].strip()
 
     if video_query.strip() != "":
+        # Get video links based on the query
         video_links = get_video_links(video_query)
 
     return chatbot_output, video_links
 
-
+# Define example prompts, client info examples, and video query examples
 example_prompts = [
     "What are some good exercises for weight loss?",
     "How many calories should I consume in a day?",
@@ -90,6 +96,7 @@ video_query_examples = [
     "Phonk x Aggressive Music for Gym Exercises"
 ]
 
+# Create the Gradio interface
 iface = gradio.Interface(
     fn=chat_interface,
     inputs=[
@@ -110,4 +117,6 @@ iface = gradio.Interface(
         )
     ]
 )
+
+# Launch the interface
 iface.launch(inline=False, share=True)
