@@ -13,7 +13,7 @@ If you want more visual explanations or demonstrations, FitBot can search YouTub
 ## Clone the repository:
 ```bash
 git clone https://github.com/Cyanex1702/FitBot_Your-Personal-Trainer-Chatbot.git
-cd fitbot
+cd FitBot
 ```
 ## Install the required dependencies using pip:
 ```bash
